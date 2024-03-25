@@ -11,9 +11,8 @@
  * the readme will list any important changes.
  *
  * @see 	    https://docs.woocommerce.com/document/template-structure/
- * @author 		WooThemes
  * @package 	WooCommerce/Templates
- * @version     2.3.0
+ * @version     3.5.0
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -25,15 +24,17 @@ if ( ! defined( 'ABSPATH' ) ) {
 <section class="section bg-light soup-woo-checkout">
     <div class="container">
     <?php 
-        wc_print_notices(); 
+        //wc_print_notices(); 
         do_action( 'woocommerce_before_checkout_form', $checkout ); 
         // If checkout registration is disabled and not logged in, the user cannot checkout
         if ( ! $checkout->is_registration_enabled() && $checkout->is_registration_required() && ! is_user_logged_in() ) {
-            echo apply_filters( 'woocommerce_checkout_must_be_logged_in_message', __( 'You must be logged in to checkout.', 'soup' ) );
+            echo esc_html( apply_filters( 'woocommerce_checkout_must_be_logged_in_message', __( 'You must be logged in to checkout.', 'soup' ) ) );
             return;
         }
     ?>
     </div> 
+    
+
     <form name="checkout" method="post" class="checkout woocommerce-checkout" action="<?php echo esc_url( wc_get_checkout_url() ); ?>" enctype="multipart/form-data"> 
         <div class="container">
             <div class="row"> 
@@ -53,6 +54,9 @@ if ( ! defined( 'ABSPATH' ) ) {
                         <?php do_action( 'woocommerce_checkout_shipping' ); ?>
                         <?php do_action( 'woocommerce_checkout_after_customer_details' ); ?>
 
+                        <?php //echo do_shortcode('[delivery_area_form]'); ?>
+                        <?php //echo do_shortcode('[delivery_areas]'); ?>
+
                         <h4 class="border-bottom pb-4 mt-5"><i class="ti ti-wallet mr-3 text-primary"></i>Payment</h4>
                         <?php do_action( 'soup_woocommerce_checkout_order_review'); ?>
                         <img src="https://www.easybird.co.za/wp-content/uploads/2018/06/PayGate-Card-Brand-Logos.png" alt="" width="700" height="67" class="aligncenter size-full wp-image-1199" />
@@ -63,3 +67,5 @@ if ( ! defined( 'ABSPATH' ) ) {
     </form> 
 </section> 
 <?php do_action( 'woocommerce_after_checkout_form', $checkout ); ?>
+
+

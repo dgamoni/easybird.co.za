@@ -49,6 +49,9 @@ if ( is_product() ){ ?>
 <?php } ?>
 	<script>
 		jQuery(document).ready(function($) {
+
+		//console.log(wc_checkout_params);
+
 			$('.reset_variations').click(function(event) {
 				//console.log(  $(this).parent() );
 				$(this).parent().find(".single_add_to_cart_button").attr('disabled', true);
@@ -118,6 +121,19 @@ if ( is_product() ){ ?>
 /*	.datastock:last-child:after {
 	  content: '';
 	}*/
+	.woocommerce form .form-row .select2-container {
+		width: 100% !important;
+	}
+	#billing_email_field {
+		clear: both;
+	}
+	#billing_city_field {
+		float: left;
+	}
+	#billing_municipality_field {
+	    width: 48%;
+	    float: right;		
+	}
 @media only screen and (max-width: 575px) {
 	.btn.soup-order {
     	width: 90%;
@@ -126,10 +142,72 @@ if ( is_product() ){ ?>
 	    width: 100%;
 	}
 }
+
+.under-label {
+	
+}
 	</style>
 
 	<script>
+		jQuery(window).load(function($) {
+	      //jQuery('#billing_address_1').val();
+		});
+
 		jQuery(document).ready(function($) {
+		
+			$('.chicken-flavours ._custom-control-input').click(function(event) {
+				//console.log('click');
+				//console.log( $(this).parents('.panel-details') );
+				$(this).parents('.panel-details').find('.panel-details-title a').trigger('click');
+				//console.log( $(this).parents('.panel-details').next() );
+				$(this).parents('.panel-details').next().find('.panel-details-title a').trigger('click');
+			});
+
+			$('.chicken-flavour ._custom-control-input').click(function(event) {
+				//console.log('click');
+				//console.log( $(this).parents('.panel-details') );
+				console.log( $(this).parents('.variations_form').attr('data-product_id') );
+				var dataid = $(this).parents('.variations_form').attr('data-product_id');
+				
+				//if(dataid != '75' || dataid != '74' || dataid != '37' ) {
+				if(dataid == '908' || dataid == '911' || dataid == '913' ) {
+
+				} else {
+					console.log('trig');
+					$(this).parents('.panel-details').find('.panel-details-title a').trigger('click');
+					//console.log( $(this).parents('.panel-details').next() );
+					$(this).parents('.panel-details').next().find('.panel-details-title a').trigger('click');					
+				}
+
+			});
+
+			$('.which-quarter ._custom-control-input').click(function(event) {
+				//console.log('click');
+				//console.log( $(this).parents('.panel-details') );
+				$(this).parents('.panel-details').find('.panel-details-title a').trigger('click');
+				//console.log( $(this).parents('.panel-details').next() );
+				$(this).parents('.panel-details').next().find('.panel-details-title a').trigger('click');
+			});
+
+			$('.side-one ._custom-control-input').click(function(event) {
+				//console.log('click');
+				//console.log( $(this).parents('.panel-details') );
+				$(this).parents('.panel-details').find('.panel-details-title a').trigger('click');
+				//console.log( $(this).parents('.panel-details').next() );
+				$(this).parents('.panel-details').next().find('.panel-details-title a').trigger('click');
+			});
+
+			$('.side-two ._custom-control-input').click(function(event) {
+				//console.log('click');
+				//console.log( $(this).parents('.panel-details') );
+				$(this).parents('.panel-details').find('.panel-details-title a').trigger('click');
+				//console.log( $(this).parents('.panel-details').next() );
+				$(this).parents('.panel-details').next().find('.panel-details-title a').trigger('click');
+			});
+									
+			//$('#billing_address_1').val();
+
+			$('.birthday_date label').append('<div class="under-label">Let us know which day to spoil you on.</div>');
 
 			$('.available_stock').each(function(index, el) {
 				var id = $(this).attr("data-id");
@@ -406,7 +484,32 @@ add_action( 'wp_loaded', function(){
 	remove_action('woocommerce_checkout_update_order_meta', 'soup_own_checkout_field_update_order_meta');
 	remove_action('woocommerce_checkout_update_user_meta', 'soup_own_checkout_field_update_user_meta');
 	remove_filter( 'woocommerce_add_to_cart_fragments', 'soup_woocommerce_header_add_to_cart_fragment_2' );
+
+	remove_filter( 'woocommerce_checkout_fields' , 'soup_remove_woo_checkout_form' );
+
 } );
+
+
+ 
+function soup_remove_woo_checkout_form_child( $fields ) {
+
+    // remove billing phone number
+    unset($fields['billing']['billing_company']);
+    //unset($fields['billing']['billing_country']); 
+    unset($fields['billing']['billing_address_2']);
+    //unset($fields['billing']['billing_postcode']); 
+ 
+    // remove shipping phone number   
+    unset($fields['shipping']['shipping_company']); 
+    //unset($fields['shipping']['shipping_country']); 
+    unset($fields['shipping']['shipping_address_2']); 
+    //unset($fields['shipping']['shipping_postcode']);
+
+    // remove order comment fields
+    //unset($fields['order']['order_comments']);
+ 
+    return $fields;
+}
 
 function wc_empty_cart_redirect_url() {
 	return home_url('/menu');
@@ -619,6 +722,20 @@ add_action( 'wp_enqueue_scripts', 'change_soup_core_js', 100 );
 function soup_add_to_cart_confirm_child(){
 	$return_to = wc_get_page_permalink( 'checkout' );
 	?>
+
+	<?php
+$byconsolewooodt_hours_format = get_option('byconsolewooodt_hours_format');
+
+if($byconsolewooodt_hours_format == 'H:i'){
+	$hourformate = '12';
+}
+
+if($byconsolewooodt_hours_format == 'h:i A'){
+	$hourformate = '24';
+}
+
+?>
+
 	<div class="soup-confirm-child">
 		<h5 class="productadded">Product added to cart.</h5>
 		<div>
@@ -740,11 +857,31 @@ function soup_add_to_cart_confirm_child(){
 		    display: flex;
     		align-items: center;
 		}
+		#billing_country_field {
+			display: none;
+		}
+		 .woocommerce form .woocommerce-billing-fields__field-wrapper .form-row label {
+		    min-height: 30px;
+		    margin-top: 10px;
+		    align-items: center;
+		    line-height: 1;
+		    display: inline-block;
+		}
+
+		/*about*/
+		.page-id-99 .section-bg-edge .image {
+    			opacity: 0.25;
+		}
+		.page-id-99 .bg-image {
+			background-size: contain;
+		}
+
 		@media only screen and (max-width: 993px) {
 			.menu-category .menu-category-title .title {
 			        bottom: inherit;
     			top: 19px;
     			font-size: 31px;
+    			font-weight: 600;
 			}
 			.term_description {
 			    padding-top: 0;
@@ -779,6 +916,11 @@ function soup_add_to_cart_confirm_child(){
 					// 	//$(this).children('a[data-toggle="collapse"]').trigger('click');
 					// 	//$(this).children('h5.panel-details-title').children('a').eq(0).click();
 					// });
+
+					//console.log( $('#soup_deliver_time').val() );
+
+
+					
 				});
 	</script>
 	<?php
@@ -994,3 +1136,145 @@ vc_map(
 		)   
 	) 
 );
+
+function dequeue_parent_script() {
+  wp_dequeue_script( 'map-api' );
+}
+add_action( 'wp_print_scripts', 'dequeue_parent_script', 100 );
+
+
+/**
+ * Load custom checkout.js
+ */
+//add_action( 'wp_enqueue_scripts', 'vb_checkout_js' );
+function vb_checkout_js() {
+    global $wp_scripts;
+    $wp_scripts->registered[ 'wc-checkout' ]->src = get_stylesheet_directory_uri() . '/js/custom.checkout.js';
+}
+
+
+add_action('wp_footer', 'add_custom_select_time');
+function add_custom_select_time() { ?>
+	<script>
+		jQuery(document).ready(function($) {
+
+
+					if( $('#soup_deliver_time').val() == 'chck-delver-opt2') {
+						//$("#byconsolewooodt_delivery_date").datepicker().datepicker("setDate", new Date()).trigger('change');
+
+						// var tomorrow = new Date();
+						// tomorrow.setDate(tomorrow.getDate() + 2);
+
+						// $("#byconsolewooodt_delivery_date").val($.datepicker.formatDate('dd-mm-yy', tomorrow )).trigger('change');
+						// //$("#byconsolewooodt_delivery_date").trigger('click');
+						
+						// jQuery('input[name="byconsolewooodt_delivery_date"]').on('change',function(){
+						// 	jQuery('input[name="byconsolewooodt_delivery_date"]').val(jQuery(this).val());
+						// });
+
+
+
+
+
+					}
+
+
+	var getUrlParameter = function getUrlParameter(sParam, url) {
+	    var sPageURL = url,
+	        sURLVariables = sPageURL.split('&'),
+	        sParameterName,
+	        i;
+
+	    for (i = 0; i < sURLVariables.length; i++) {
+	        sParameterName = sURLVariables[i].split('=');
+
+	        if (sParameterName[0] === sParam) {
+	            return sParameterName[1] === undefined ? true : sParameterName[1];
+	        }
+	    }
+	}
+
+					$(document).ajaxComplete(function(event, xhr, settings) {
+						//console.log(settings.url);
+						console.log(settings.data);
+						//console.log(xhr);
+						//onsole.log(event);
+
+						console.log(getUrlParameter('action', settings.data));
+
+						//if(settings.data == 'action=byconsolewoodt_cart_total_action&byc_cart_total_price_val=') {
+						if( getUrlParameter('action', settings.data) == 'byconsolewoodt_cart_total_action' && $('#soup_deliver_time').val() == 'chck-delver-opt2' ) {
+							var tomorrow = new Date();
+							tomorrow.setDate(tomorrow.getDate() + 2);
+							 $("#byconsolewooodt_delivery_date").val($.datepicker.formatDate('dd-mm-yy', tomorrow )).trigger('change');
+							 $("#byconsolewooodt_delivery_date_alternate").val($.datepicker.formatDate('dd-mm-yy', tomorrow )).trigger('change');
+
+							console.log( $("#byconsolewooodt_delivery_date").val() );
+
+		
+							var curtime= new Date().toLocaleTimeString("en-US", { hour<?php echo $hourformate;?>: false, hour: "numeric", minute: "numeric"});
+							var current_system_time= curtime.split(' ');
+							var current_system_time_without_comma = curtime.replace(","," "); 
+
+							var pickdate = jQuery("#byconsolewooodt_delivery_date").val();
+							var picklocation = jQuery("#byconsolewooodt_pickup_location").val();
+							picklocation =1;
+							console.log(pickdate);
+							console.log(picklocation);
+							console.log(current_system_time_without_comma);
+
+							var selected_data = {
+							      'action': 'get_delivery_time_by_selected_date',
+							      'selected_date_value' : pickdate,
+								  'selected_location_value' : picklocation,
+								  'current_system_time' : current_system_time_without_comma,
+							    };	
+
+
+							var ajaxurl = "<?php echo admin_url('admin-ajax.php'); ?>";
+
+						    jQuery.post( ajaxurl, selected_data, function( response)  {
+
+								if(response == 'No time is available for todays')	{	
+
+								}	else	{	
+
+									jQuery("#byconsolewooodt_delivery_time").timepicker("remove");
+									jQuery("#byconsolewooodt_delivery_time").empty();			
+									jQuery("#byconsolewooodt_delivery_time").html('wait a moment please....');	
+									jQuery("#byconsolewooodt_delivery_time").append(response);
+									jQuery(".loading_image_contanier").css("display","none");
+
+									console.log( $('#byconsolewooodt_delivery_time')[0][1].value );
+
+									jQuery("#byconsolewooodt_delivery_time").val( $('#byconsolewooodt_delivery_time')[0][1].value );
+								}
+
+						    });
+
+						}
+
+
+					});
+
+		});
+	</script>
+	<style>
+
+	</style>
+	<?php
+}
+
+// Hook in
+//add_filter( 'woocommerce_checkout_fields' , 'custom_override_default_address_fields' );
+
+// Our hooked in function - $address_fields is passed via the filter!
+function custom_override_default_address_fields( $address_fields ) {
+
+	//print_r(  $address_fields ); // wrap results in pre html tag to make it clearer
+	//exit;
+     $address_fields['byconsolewooodt_delivery_date']['required'] = false;
+     $address_fields['byconsolewooodt_delivery_time']['required'] = false;
+
+     return $address_fields;
+}
