@@ -82,6 +82,12 @@ if ( is_product() ){ ?>
 		});
 	</script>
 	<style>
+	.woocommerce-checkout .form-row.place-order {
+	    bottom: 40px;
+	}
+	.woocommerce-checkout .p-md-5.custom_margin {
+		padding-bottom: 170px !important;
+	}
 	#byconsolewooodt_delivery_type_field {
 		display: none;
 	}
@@ -108,7 +114,11 @@ if ( is_product() ){ ?>
 /*	.datastock:last-child:after {
 	  content: '';
 	}*/
-
+@media only screen and (max-width: 575px) {
+	.btn.soup-order {
+    	width: 90%;
+	}
+}
 	</style>
 
 	<script>
@@ -583,3 +593,100 @@ add_filter( 'woocommerce_can_reduce_order_stock', 'wcs_do_not_reduce_renewal_sto
 //     $address_fields['billing_postcode']['required'] = false;
 //     return $address_fields;
 //   }
+
+
+function change_soup_core_js() {
+   wp_dequeue_script( 'add-to-cart-variation_ajax' );
+   wp_deregister_script( 'add-to-cart-variation_ajax' );
+   //wp_enqueue_script( 'avia-default', CORE_URL .'/js/avia.js', array('jquery'), 2, true );
+    wp_enqueue_script( 'add-to-cart-variation_ajax', get_stylesheet_directory_uri() . '/soup-core/woocommerce-ajax-add-to-cart-variable-products/js/add-to-cart-variation.js',
+     array('jquery'), '5.3', true );
+
+    if(is_checkout()):
+	    wp_register_script('jquery-ui-datepicker2', get_stylesheet_directory_uri() .'/js/jquery-ui.js', array('jquery'),'1.12', true);
+		wp_enqueue_script('jquery-ui-datepicker2');
+	endif;
+}
+add_action( 'wp_enqueue_scripts', 'change_soup_core_js', 100 );
+
+function soup_add_to_cart_confirm_child(){
+	$return_to = wc_get_page_permalink( 'checkout' );
+	?>
+	<div class="soup-confirm-child">
+		<h5 class="productadded">Product added to cart.</h5>
+		<div>
+			<a href="#" class="btn btn-primary continue_shopping">
+				Continue Shopping
+			</a>
+			<a href="<?php echo $return_to; ?>" class="btn btn-secondary check">
+				Checkout
+			</a>
+		</div>
+	</div>
+	<style>
+		.productadded {
+			text-align: center;
+		}
+		.soup-confirm-child {
+		    position: fixed;
+		    /*left: 47%;*/
+		    /*top: 50%;*/
+		    top: calc(50% - 62px); 
+  			left: calc(50% - 159px); 
+		    background: #ddd;
+		    padding: 40px;
+		    border-radius: 3px;
+    		z-index: 9999;
+    		display: none;
+		}
+		.productadded:before {
+			font-family: WooCommerce;
+		    content: '\e017';
+		    /*margin-left: .53em;*/
+		        margin-right: .53em;
+		    vertical-align: bottom;
+		}
+		.soup-confirm-child .btn:hover,
+		.soup-confirm-child .btn:focus,
+		.soup-confirm-child .btn:active,
+		.soup-confirm-child .btn:focus:active {
+		    -webkit-transform: translateY(0px);
+		    -moz-transform: translateY(0px);
+		    -ms-transform: translateY(0px);
+		    -o-transform: translateY(0px);
+		    transform: translateY(0px);
+		}
+		.soup-confirm-child .btn-secondary:before,
+		.soup-confirm-child .btn-primary:before {
+		    display: none;
+		}
+		.soup-confirm-child .btn.btn-secondary:hover:before,
+		.soup-confirm-child  .btn.btn-secondary:focus:before,
+		.soup-confirm-child  .btn.btn-secondary:active:before,
+		.soup-confirm-child  .btn.btn-secondary:focus:active:before {
+    		background-color: transparent;
+    		/*opacity: 0.3;*/
+		}
+	</style>
+	<script>
+			jQuery(document).ready(function($) {
+					$(".soup-confirm-child a.continue_shopping").click(function(e) {
+						e.preventDefault();
+						$(".soup-confirm-child").fadeOut();
+					});
+					$(".soup-confirm-child a.check").click(function(e) {
+						//e.preventDefault();
+						$(".soup-confirm-child").fadeOut();
+					});
+				});
+	</script>
+	<?php
+}
+add_action('wp_footer','soup_add_to_cart_confirm_child');
+
+
+add_filter( 'woocommerce_shipping_package_name' , 'woocommerce_replace_text_shipping_to_delivery', 10, 3);
+
+function woocommerce_replace_text_shipping_to_delivery($package_name, $i, $package){
+    return sprintf( _nx( 'Delivery', 'Delivery %d', ( $i + 1 ), 'shipping packages', 'soup' ), ( $i + 1 ) );
+}

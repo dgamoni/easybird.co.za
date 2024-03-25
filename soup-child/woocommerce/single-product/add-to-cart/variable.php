@@ -13,11 +13,10 @@
  * @see 	https://docs.woocommerce.com/document/template-structure/
  * @author  WooThemes
  * @package WooCommerce/Templates
- * @version 3.0.0
+ * @version 3.4.1
  */
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+
+defined( 'ABSPATH' ) || exit;
 
 if ( ! function_exists( 'print_attribute_radio_custom' ) ) {
 	function print_attribute_radio_custom( $checked_value, $value, $label, $name, $class ) {
