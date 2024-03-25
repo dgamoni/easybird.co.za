@@ -49,19 +49,23 @@ if ( is_product() ){ ?>
 <?php } ?>
 	<script>
 		jQuery(document).ready(function($) {
-
+			$('.reset_variations').click(function(event) {
+				//console.log(  $(this).parent() );
+				$(this).parent().find(".single_add_to_cart_button").attr('disabled', true);
+				$('._custom-control-indicator').show();
+			});
 			$(".variations_form input[name='variation_id']").change(function(event) {
 				//console.log( $(".variations_form input[name='variation_id']").val() );
 				var modal = $(this).closest('.modal');
 				//console.log(modal);
 				var this_id = modal.attr('id');
 				if(modal.length >0) {
-					console.log('modal');
+					//console.log('modal');
 					if($("#"+this_id+" .variations_form input[name='variation_id']").val()) {
 						$("#"+this_id+" .variations_form .single_add_to_cart_button").removeAttr("disabled");
 					}
 				} else {
-					console.log('nomodal');
+					//console.log('nomodal');
 					if($(".variations_form input[name='variation_id']").val()) {
 						$(".variations_form .single_add_to_cart_button").removeAttr("disabled");
 					}	
@@ -117,6 +121,9 @@ if ( is_product() ){ ?>
 @media only screen and (max-width: 575px) {
 	.btn.soup-order {
     	width: 90%;
+	}
+	#soup_deliver_time_field {
+	    width: 100%;
 	}
 }
 	</style>
@@ -667,9 +674,98 @@ function soup_add_to_cart_confirm_child(){
     		background-color: transparent;
     		/*opacity: 0.3;*/
 		}
+		.panel-details-title a {
+			padding-left: 50px;
+   			margin-left: -50px;
+		}
+		._custom-control-indicator {
+			top: 0.1em !important;
+		    font-weight: 400;
+		    font-family: "Oswald", sans-serif;
+		    width: 1.3em !important;
+		    height: 1.3em !important;
+		    margin-right: 0.5rem;
+		    -webkit-border-radius: 50%;
+		    -moz-border-radius: 50%;
+		    -ms-border-radius: 50%;
+		    -o-border-radius: 50%;
+		    border-radius: 50%;
+		    border: 2px solid #e0e0e0;
+		    background-color: #fff !important;
+		    position: absolute;
+		    top: .25rem;
+		    left: 0;
+		    display: block;
+		    width: 1rem;
+		    height: 1rem;
+		    pointer-events: none;
+		    -webkit-user-select: none;
+		    -moz-user-select: none;
+		    -ms-user-select: none;
+		    user-select: none;
+		    background-color: #ddd;
+		    background-repeat: no-repeat;
+		    background-position: center center;
+		    -webkit-background-size: 50% 50%;
+		    background-size: 50% 50%;
+		}
+		._custom-control-indicator > svg {
+		    position: absolute;
+		    top: 0;
+		    left: 0;
+		    height: 100%;
+		    width: 100%;
+		}
+		#byconsolewooodt_delivery_location_field .optional,
+		#byconsolewooodt_delivery_date_field .optional,
+		#byconsolewooodt_delivery_time_field .optional {
+			display: none;
+		}
+		.term_description {
+		    position: absolute;
+		    bottom: -84px;
+		    left: 0;
+		    padding: 60px;
+		        width: 100%;
+		}
+		.term_description p {
+			    line-height: 19px;
+		    font-weight: 300;
+		     /*border: 1px solid white;*/ 
+		    padding: 2px 8px;
+		    /*background-color: #0000006e;*/
+		    height: 44px;
+		    overflow: hidden;
+		    text-overflow: ellipsis;
+		    display: flex;
+    		align-items: center;
+		}
+		@media only screen and (max-width: 993px) {
+			.menu-category .menu-category-title .title {
+			        bottom: inherit;
+    			top: 19px;
+    			font-size: 31px;
+			}
+			.term_description {
+			    padding-top: 0;
+			    bottom: -49px;
+			    padding-left: 23px;
+			}
+			.term_description p {
+			    height: initial;
+			        margin: 0;
+    			line-height: 1;
+			}
+		}
 	</style>
 	<script>
 			jQuery(document).ready(function($) {
+					$('._custom-control-input').click(function(event) {
+						//console.log( $(this).parent().parent().attr('data-id'); );
+						var idd = $(this).parent().parent().attr('data-id');
+						//console.log(idd);
+						$('._custom-control-indicator[data-id="'+ idd +'"]').hide();
+					});
 					$(".soup-confirm-child a.continue_shopping").click(function(e) {
 						e.preventDefault();
 						$(".soup-confirm-child").fadeOut();
@@ -678,6 +774,11 @@ function soup_add_to_cart_confirm_child(){
 						//e.preventDefault();
 						$(".soup-confirm-child").fadeOut();
 					});
+					// $('.variations.panel-details').click(function(e) {
+					// 	console.log($(this).children('h5.panel-details-title').children('a'));
+					// 	//$(this).children('a[data-toggle="collapse"]').trigger('click');
+					// 	//$(this).children('h5.panel-details-title').children('a').eq(0).click();
+					// });
 				});
 	</script>
 	<?php
@@ -690,3 +791,206 @@ add_filter( 'woocommerce_shipping_package_name' , 'woocommerce_replace_text_ship
 function woocommerce_replace_text_shipping_to_delivery($package_name, $i, $package){
     return sprintf( _nx( 'Delivery', 'Delivery %d', ( $i + 1 ), 'shipping packages', 'soup' ), ( $i + 1 ) );
 }
+
+
+
+
+// Process the checkout (Checking if required fields are not empty)
+add_action('woocommerce_checkout_process', 'ba_custom_checkout_field_process');
+function ba_custom_checkout_field_process() {
+
+    if ( !$_POST['byconsolewooodt_delivery_location'] ) {
+		 wc_add_notice( __('Please select a <strong>delivery location</strong>.' ), 'error');
+    }
+
+
+    if ( !$_POST['byconsolewooodt_delivery_date'] ) {
+		 wc_add_notice( __('Please select a <strong>delivery date</strong>.' ), 'error');
+    }
+    
+    if ( $_POST['byconsolewooodt_delivery_time'] == 'Select time' ) {
+    	 wc_add_notice( __('Please select a <strong>delivery time</strong>.' ), 'error');
+    }
+
+
+}
+
+
+function soup_list_collapse_custom($atts,$content=null){
+	extract(shortcode_atts(array(
+	    'list_collaps' =>1, 
+	    'list_orderby' =>'id',  
+	    'list_order' =>'desc',  
+	    'list_bnrimg' =>'',  
+	    'list_mnuttl' =>'',   
+	    'list_colps_num_pro' =>'4',   
+	    'list_fodcat' =>''   
+	), $atts));    
+    $list_image = wp_get_attachment_image_src($list_bnrimg,'list-img');
+    $list_img = $list_image[0];  
+	if($list_collaps==1){
+		$list_bpn = 'true';
+		$list_dpn = 'show';
+	}else{ 
+		$list_bpn = '';
+		$list_dpn = '';
+	} 
+	$soup_menu_lnk = str_replace(" ","_",strtolower($list_mnuttl));
+	$soup_menu_lnkM = str_replace(" ","__",strtolower($list_mnuttl))."_1";
+	global $post;
+	$term = get_term_by('slug', $list_fodcat, 'product_cat');
+	$description = term_description($term->term_id, 'product_cat');
+
+	ob_start(); ?> 
+	    <div id="<?php echo $soup_menu_lnkM; ?>" class="menu-category">
+	        <div class="menu-category-title collapse-toggle" role="tab" data-target="#<?php echo $soup_menu_lnk; ?>" data-toggle="collapse" aria-expanded="<?php echo $list_bpn; ?>">
+	            <div class="bg-image"><img src="<?php echo esc_url($list_img); ?>" alt="Food Menu"></div>
+	            <h2 class="title"><?php echo $list_mnuttl; ?></h2>
+	            <?php if($description): ?><div class="term_description"><?php echo $description; ?></div><?php endif; ?>
+	        </div>
+	        <div id="<?php echo $soup_menu_lnk; ?>" class="menu-category-content collapse  <?php echo $list_dpn; ?>"> 
+            	<?php   
+				$product_args = array(
+					'post_type'=>'product',
+					'product_cat' => $list_fodcat,
+					'posts_per_page'=> $soup_girdnvg_num_pro, 
+					'order'=>$list_order, 
+					'orderby'=>$list_orderby 
+				);
+            	if($list_orderby=='meta_value_num'){
+            		$product_args['meta_key'] = '_price';
+            	} 
+            	$product_query = new WP_Query($product_args); ?>
+	        	<?php while($product_query->have_posts()): $product_query->the_post(); ?>
+	                <div class="menu-item menu-list-item">
+	                    <div class="row align-items-center">
+	                        <div class="col-sm-6 mb-2 mb-sm-0">
+	                            <h6 class="mb-0"><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a></h6>
+	                            <span class="text-muted text-sm"><?php echo apply_filters( 'woocommerce_short_description', $post->post_excerpt ); ?></span>
+	                        </div>
+	                        <div class="col-sm-6 text-sm-right">
+	                            <span class="text-md mr-4"><?php echo soup_variation_price_format(); ?></span>
+	                            <button class="btn btn-outline-secondary btn-sm" data-target="#productModal_<?php echo get_the_ID(); ?>" data-toggle="modal"><span><?php global $product; echo esc_html( $product->single_add_to_cart_text() ); ?></span></button>
+	                        </div>
+	                    </div>
+	                </div>
+				<!-- Modal / Product -->
+				<div class="modal fade woocommerce" id="productModal_<?php echo get_the_ID(); ?>" role="dialog">
+				    <div class="modal-dialog" role="document">
+				        <div class="modal-content">
+				            <div class="modal-header modal-header-lg dark bg-dark">
+				            	<?php global $soup; 
+				            		$popup_title = (!empty($soup['pop_up_title'])) ? $soup['pop_up_title'] : 'Specify your dish';
+				            		$popup_title_bgimh = (!empty($soup['pop_up_bgimg']['url'])) ? $soup['pop_up_bgimg']['url'] : get_template_directory_uri().'/assets/img/photos/modal-add.jpg';
+				            	?>
+				                <div class="bg-image"><img src="<?php echo esc_url($popup_title_bgimh); ?>" alt=""></div>
+				                <h4 class="modal-title"><?php echo $popup_title; ?></h4>
+				                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><i class="ti-close"></i></button>
+				            </div>
+				            <div class="modal-product-details">
+				                <div class="row align-items-center">
+				                    <div class="col-8">
+				                        <h6 class="mb-0"><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a></h6>
+				                        <span class="text-muted"><?php echo apply_filters( 'woocommerce_short_description', $post->post_excerpt ); ?></span>
+				                    </div>
+				                    <div class="col-4 text-lg text-right"><?php echo soup_variation_price_format(); ?></div>
+				                </div>
+				            </div>
+				            <div class="modal-body panel-details-container popsoup"> 
+					        	<?php do_action( 'woocommerce_single_product_cart' ); ?>
+				            </div> 
+				        </div>
+				    </div>
+				</div>
+				<?php endwhile; wp_reset_postdata(); ?>  
+	        </div>
+	    </div> 
+<?php return ob_get_clean();
+}
+add_shortcode('list_collapse_custom','soup_list_collapse_custom');
+
+// Display list collapse
+vc_map( 
+    array(
+		'name' => esc_html__('List Collapse Custom', 'soup'),
+		'base' => 'list_collapse_custom',
+		'class' => '',
+		'icon' => 'icon-mpc-prod_slider',
+		'category' => esc_html__('Soup', 'soup'),
+		'params' => array( 
+			array(
+				'type' => 'dropdown',
+				'heading' => esc_html__('Open', 'soup'),
+				'param_name' => 'list_collaps',
+				'value' => array(
+					esc_html__('Yes','soup') => '1',
+					esc_html__('No','soup') => '2'  
+					),
+				'admin_label' => true,
+                'description' => esc_html__('Select one of them.', 'soup')
+			),  
+			array(
+				'type' => 'attach_image',
+				'heading' => esc_html__('Image', 'soup'),
+				'param_name' => 'list_bnrimg',
+				'value' => '',
+				'admin_label' => true,
+                'description' => esc_html__('Upload banner image.', 'soup')
+			),  
+			array(
+				'type' => 'textfield',
+				'heading' => esc_html__('Title', 'soup'),
+				'param_name' => 'list_mnuttl',
+				'value' => '',
+				'admin_label' => true,
+                'description' => esc_html__('Write title here.', 'soup')
+			),  
+			array(
+				'type' => 'textfield',
+				'heading' => esc_html__('Category Slug', 'soup'),
+				'param_name' => 'list_fodcat',
+				'value' => '',
+				'admin_label' => true,
+                'description' => esc_html__('Input category slug here.', 'soup')
+			),
+            array(
+                'type' => 'textfield',
+                'value' => '',
+                'heading' => esc_html__('Number of Product to Show', 'soup'),
+                'param_name' => 'list_colps_num_pro',
+                'description' => esc_html__('Input numeric value here.', 'soup')
+            ),
+			array(
+				'type' => 'dropdown',
+				'heading' => esc_html__('Orderby', 'soup'),
+				'param_name' => 'list_orderby',
+				'value' => array(
+					esc_html__('None','soup') => 'none',
+					esc_html__('Price','soup') => 'meta_value_num', 
+					esc_html__('Random','soup') => 'rand',  
+					esc_html__('ID','soup') => 'id',  
+					esc_html__('Title','soup') => 'title',  
+					esc_html__('Slug','soup') => 'name',  
+					esc_html__('Date','soup') => 'date',  
+					esc_html__('Modified Date','soup') => 'modified',  
+					esc_html__('Parent ID','soup') => 'parent',  
+					esc_html__('Menu Order','soup') => 'menu_order',  
+					esc_html__('Comment Count','soup') => 'comment_count',  
+					),
+				'admin_label' => true,
+                'description' => esc_html__('Select one of them.', 'soup')
+			),
+			array(
+				'type' => 'dropdown',
+				'heading' => esc_html__('Order', 'soup'),
+				'param_name' => 'list_order',
+				'value' => array(
+					esc_html__('ASC','soup') => 'asc',
+					esc_html__('DESC','soup') => 'desc',   
+					),
+				'admin_label' => true,
+                'description' => esc_html__('Select one of them.', 'soup')
+			)   
+		)   
+	) 
+);

@@ -144,6 +144,9 @@ do_action( 'woocommerce_before_add_to_cart_form' ); ?>
                 <label class="custom-control custom-radio">
                     <input name="radio_title_<?php echo wc_attribute_label( $nm_atr ); ?>" type="radio" class="custom-control-input">
                     <span class="custom-control-indicator"></span>
+                    <span class="_custom-control-indicator" data-id="<?php echo $tab_id; ?>">
+                    	<svg class="icon" x="0px" y="0px" viewBox="0 0 32 32"><path stroke-dasharray="19.79 19.79" stroke-dashoffset="19.79" fill="none" stroke="#FFFFFF" stroke-width="4" stroke-linecap="square" stroke-miterlimit="10" d="M9,17l3.9,3.9c0.1,0.1,0.2,0.1,0.3,0L23,11"></path></svg>
+                    </span>
                 </label>
                 <a href="#panelDetails_<?php echo $tab_id; ?>" data-toggle="collapse"><?php echo wc_attribute_label( $name ); ?></a>
             </h5>
@@ -158,8 +161,8 @@ do_action( 'woocommerce_before_add_to_cart_form' ); ?>
 						}
 						?>
 
-            <div id="panelDetails_<?php echo $tab_id; ?>" class="collapse">
-                <div class="panel-details-content value stok_wrap"> 
+            <div id="panelDetails_<?php echo $tab_id; ?>"  class="collapse">
+                <div class="panel-details-content value stok_wrap"  data-id="<?php echo $tab_id; ?>"> 
  
 							<?php
 							if ( ! empty( $options ) ) {
